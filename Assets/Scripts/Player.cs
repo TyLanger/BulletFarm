@@ -20,10 +20,19 @@ public class Player : MonoBehaviour {
     // bullets caught
     int numBulletsCaught = 0;
 
+    // backpack open/close
+    public GameObject backpackVisuals;
+    SpriteRenderer backpackRenderer;
+    public Sprite backPackOpenSprite;
+    Sprite backpackCloseSprite;
+
+
 
     // Use this for initialization
     void Start () {
 		currentMoveSpeed = baseMoveSpeed;
+        backpackRenderer = backpackVisuals.GetComponent<SpriteRenderer>();
+        backpackCloseSprite = backpackRenderer.sprite;
 	}
 	
 	// Update is called once per frame
@@ -68,6 +77,18 @@ public class Player : MonoBehaviour {
 
     public void CatchBullet()
     {
-        numBulletsCaught++;
+        CatchBullet(1);
+    }
+
+    public void CatchBullet(int numBullets)
+    {
+        numBulletsCaught += numBullets;
+        backpackRenderer.sprite = backPackOpenSprite;
+        Invoke("BackpackClose", 0.5f);
+    }
+
+    void BackpackClose()
+    {
+        backpackRenderer.sprite = backpackCloseSprite;
     }
 }

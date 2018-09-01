@@ -13,10 +13,23 @@ public class Gun : Weapon {
     float timeOfNextShot = 0;
     public float timeToReload = 3;
 
+    protected override void Start()
+    {
+        base.Start();
+        currentNumBullets = clipSize;
+    }
+
     void Reload()
     {
+        GetComponent<SpriteRenderer>().color = Color.grey;
         timeOfNextShot = Time.time + timeToReload;
         currentNumBullets = clipSize;
+        Invoke("ResetColour", timeToReload);
+    }
+
+    void ResetColour()
+    {
+        GetComponent<SpriteRenderer>().color = Color.white;
     }
 
     public void Fire()

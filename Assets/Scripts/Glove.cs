@@ -8,6 +8,8 @@ public class Glove : Weapon {
     Player player;
     CircleCollider2D gloveCollider;
     SpriteRenderer spriteRenderer;
+    Sprite openGlove;
+    public Sprite closedGlove;
 
     // glove can only catch on bullet at a time
     // once it catches a bullet, the bullet must be put away
@@ -19,6 +21,7 @@ public class Glove : Weapon {
         base.Start();
         gloveCollider = GetComponent<CircleCollider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        openGlove = spriteRenderer.sprite;
         player = GetComponentInParent<Player>();
     }
 
@@ -35,10 +38,12 @@ public class Glove : Weapon {
             // change the sprite to a closed glove if need be
             if(!isOpen)
             {
+                spriteRenderer.sprite = closedGlove;
                 spriteRenderer.color = Color.grey;
             }
             else
             {
+                spriteRenderer.sprite = openGlove;
                 spriteRenderer.color = Color.white;
 
             }
