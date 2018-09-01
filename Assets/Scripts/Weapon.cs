@@ -33,7 +33,7 @@ public class Weapon : MonoBehaviour {
         transform.position = parent.position + new Vector3(aimDirection.x, aimDirection.y, 0) * orbitDistance;
 	}
 
-    public void SetAimDirection(Vector2 dir)
+    public virtual void SetAimDirection(Vector2 dir)
     {
         aimDirection = dir;
         // from up because that is the default direction of the sprites. Sprites are made so up is the way they should point

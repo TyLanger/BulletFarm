@@ -26,7 +26,17 @@ public class Player : MonoBehaviour {
     public Sprite backPackOpenSprite;
     Sprite backpackCloseSprite;
 
+    // butterfly net
+    public float butterflyNetCooldown = 1;
+    float timeOfNextButterflyNetUse = 0;
+    public GameObject butterflyNet;
+    // while swinging the net, can't use the glove
+    // can't change your aim
+    bool usingButterflyNet = false;
+    float timeToSwingButterflyNet = 0.5f;
 
+    // alternate implementation
+    public ButterflyNet bNet;
 
     // Use this for initialization
     void Start () {
@@ -49,10 +59,14 @@ public class Player : MonoBehaviour {
         {
             // if facing right, but mouse is to the left, turn
             // if facing left, but mouse to the right, turn
-            
-            SwapFacing();
+            if (!usingButterflyNet)
+            {
+                // can't swap while using the butterfly net
+                SwapFacing();
+            }
         }
 
+        // Use ball glove with left click
         if(Input.GetButtonDown("Fire1"))
         {
             gloveOpen = true;
@@ -62,12 +76,33 @@ public class Player : MonoBehaviour {
             gloveOpen = false;
         }
         ballGlove.SetGloveOpen(gloveOpen);
+
+        // Use butterfly net with right click
+        if(Input.GetButtonDown("Fire2"))
+        {
+            if (!usingButterflyNet)
+            {
+                SwingBNet();
+            }
+        }
     }
 
     void FixedUpdate()
     {
         transform.position = Vector3.MoveTowards(transform.position, transform.position + moveInput, currentMoveSpeed * Time.fixedDeltaTime);
     }
+
+    void SwingBNet()
+    {
+        // butterfly net as a weapon
+        // swings with setting the aim direction
+
+        // start swinging in the current direction
+        bNet.SetAimDirection(aimDirection);
+        // butterflyNet now calls swing net from its SetAimDirection()
+        //bNet.SwingNet();
+    }
+    
 
     void SwapFacing()
     {

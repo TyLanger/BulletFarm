@@ -6,13 +6,14 @@ public class Bullet : MonoBehaviour {
 
 
     public float moveSpeed = 2;
-
+    bool isMoving = true;
 
     void FixedUpdate()
     {
-
-        transform.position = Vector3.MoveTowards(transform.position, transform.position + transform.up, moveSpeed * Time.fixedDeltaTime);
-
+        if (isMoving)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, transform.position + transform.up, moveSpeed * Time.fixedDeltaTime);
+        }
     }
 
     void OnTriggerEnter2D(Collider2D col)
@@ -26,20 +27,27 @@ public class Bullet : MonoBehaviour {
         {
             if (col.transform.tag == "Player")
             {
-                DestroyBullet();
+                CaughtBullet();
             }
             if(col.transform.tag == "Catcher")
             {
                 // hit something that can catch bullets
-                DestroyBullet();
+                CaughtBullet();
             }
         }
+    }
+
+    void CaughtBullet()
+    {
+        // bullet is stopped and rides around with whatever caught it until it is destroyed
+        isMoving = false;
+        //transform.localScale = Vector3.one * 0.5f;
     }
 
     void DestroyBullet()
     {
         // play explosion animation if any?
-
+        
         Destroy(gameObject);
     }
 

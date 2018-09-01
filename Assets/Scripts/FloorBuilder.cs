@@ -22,11 +22,7 @@ public class FloorBuilder : MonoBehaviour {
 	}
 
     
-    private void OnValidate()
-    {
-        InitializeFloor();
-        BuildFloor();
-    }
+    
 
     void InitializeFloor()
     {

@@ -15,7 +15,9 @@ public class Glove : Weapon {
     // once it catches a bullet, the bullet must be put away
     public float timeToPutAwayBullet = 0.5f;
     bool puttingAwayBullet = false;
-	
+    GameObject caughtBullet;
+
+
     protected override void Start()
     {
         base.Start();
@@ -53,7 +55,9 @@ public class Glove : Weapon {
     void FreeUpGlove()
     {
         //SetGloveOpen(true);
+        player.CatchBullet();
         puttingAwayBullet = false;
+        Destroy(caughtBullet);
     }
 
     public void CatchBullet()
@@ -62,7 +66,8 @@ public class Glove : Weapon {
         // during this time, you can't manually open the glove
         SetGloveOpen(false);
         puttingAwayBullet = true;
-        player.CatchBullet();
+        // move the bullet into the glove a bit
+        caughtBullet.transform.position = Vector3.MoveTowards(caughtBullet.transform.position, transform.position, 5 * Time.fixedDeltaTime);
         Invoke("FreeUpGlove", timeToPutAwayBullet);
     }
 
@@ -70,6 +75,8 @@ public class Glove : Weapon {
     {
         if(col.tag == "Bullet")
         {
+            caughtBullet = col.gameObject;
+            col.transform.parent = transform;
             CatchBullet();
         }
     }
