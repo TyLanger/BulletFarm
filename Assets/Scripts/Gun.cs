@@ -8,9 +8,9 @@ public class Gun : Weapon {
     public GameObject bullet;
 
     public int clipSize = 6;
-    int currentNumBullets;
+    protected int currentNumBullets;
     public float timeBetweenShots = 1;
-    float timeOfNextShot = 0;
+    protected float timeOfNextShot = 0;
     public float timeToReload = 3;
 
     protected override void Start()
@@ -19,7 +19,7 @@ public class Gun : Weapon {
         currentNumBullets = clipSize;
     }
 
-    void Reload()
+    protected void Reload()
     {
         GetComponent<SpriteRenderer>().color = Color.grey;
         timeOfNextShot = Time.time + timeToReload;
@@ -32,7 +32,7 @@ public class Gun : Weapon {
         GetComponent<SpriteRenderer>().color = Color.white;
     }
 
-    public void Fire()
+    public virtual void Fire()
     {
         if(Time.time > timeOfNextShot)
         {

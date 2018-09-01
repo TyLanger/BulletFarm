@@ -34,6 +34,10 @@ public class Bullet : MonoBehaviour {
                 // hit something that can catch bullets
                 CaughtBullet();
             }
+            if(col.transform.tag == "Wall")
+            {
+                DestroyBullet();
+            }
         }
     }
 
@@ -42,6 +46,7 @@ public class Bullet : MonoBehaviour {
         // bullet is stopped and rides around with whatever caught it until it is destroyed
         isMoving = false;
         //transform.localScale = Vector3.one * 0.5f;
+        GetComponent<BoxCollider2D>().enabled = false;
     }
 
     void DestroyBullet()

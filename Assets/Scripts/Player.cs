@@ -38,8 +38,15 @@ public class Player : MonoBehaviour {
     // alternate implementation
     public ButterflyNet bNet;
 
+
+    int maxNumBulletsCaught = 3;
+    int currentNumBulletsCaught = 0;
+    GameObject[] bulletsCaught;
+
+
     // Use this for initialization
     void Start () {
+        bulletsCaught = new GameObject[maxNumBulletsCaught];
 		currentMoveSpeed = baseMoveSpeed;
         backpackRenderer = backpackVisuals.GetComponent<SpriteRenderer>();
         backpackCloseSprite = backpackRenderer.sprite;
@@ -125,5 +132,29 @@ public class Player : MonoBehaviour {
     void BackpackClose()
     {
         backpackRenderer.sprite = backpackCloseSprite;
+    }
+
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.tag == "Bullet")
+        {
+            if (currentNumBulletsCaught < maxNumBulletsCaught)
+            {
+                // only add to the array until it's full
+                bulletsCaught[currentNumBulletsCaught] = col.gameObject;
+            }
+
+            col.transform.parent = transform;
+            col.transform.position = Vector3.MoveTowards(col.transform.position, transform.position, 3 * Time.fixedDeltaTime);
+
+            // remove the rigidbody so when you push against objects, the bullets don't fly off on their own
+            Destroy(col.gameObject.GetComponent<Rigidbody2D>());
+            currentNumBulletsCaught++;
+            if (currentNumBulletsCaught > maxNumBulletsCaught)
+            {
+                // you died
+            }
+
+        }
     }
 }

@@ -14,6 +14,12 @@ public class ButterflyNet : Weapon {
     Player player;
     CircleCollider2D circleCollider;
 
+    // only the first bullet gets drug along.
+    // other bullets you catch get destroyed.
+    // this is just visuals. You still get the points for all of the bullets
+    GameObject caughtBullet;
+    public Transform netPosition;
+
     protected override void Start()
     {
         base.Start();
@@ -47,7 +53,9 @@ public class ButterflyNet : Weapon {
         // updates bullets caught, if any
         if (numBulletsCaught > 0)
         {
+            Destroy(caughtBullet.gameObject);
             player.CatchBullet(numBulletsCaught);
+            numBulletsCaught = 0;
         }
     }
 
@@ -98,6 +106,18 @@ public class ButterflyNet : Weapon {
     {
         if (col.tag == "Bullet")
         {
+            if (numBulletsCaught == 0)
+            {
+                // only have the first bullet show in the net
+                caughtBullet = col.gameObject;
+                col.transform.parent = transform;
+                // move the bullet into the net a bit
+                col.transform.position = Vector3.MoveTowards(col.transform.position, netPosition.position, 5 * Time.fixedDeltaTime);
+            }
+            else
+            {
+                Destroy(col.gameObject);
+            }
             numBulletsCaught++;
         }
     }
