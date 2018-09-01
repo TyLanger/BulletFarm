@@ -17,7 +17,7 @@ public class Weapon : MonoBehaviour {
 
 
 	// Use this for initialization
-	void Start () {
+	protected virtual void Start () {
 		
 	}
 	
@@ -36,5 +36,7 @@ public class Weapon : MonoBehaviour {
     public void SetAimDirection(Vector2 dir)
     {
         aimDirection = dir;
+        // from up because that is the default direction of the sprites. Sprites are made so up is the way they should point
+        transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
     }
 }

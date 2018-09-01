@@ -10,13 +10,13 @@ public class Enemy : MonoBehaviour {
     Vector2 aimDirection;
     bool facingRight = true;
 
-    Weapon weapon;
+    Gun weapon;
 
     // Use this for initialization
     void Start()
     {
         player = FindObjectOfType<Player>().transform;
-        weapon = GetComponentInChildren<Weapon>();
+        weapon = GetComponentInChildren<Gun>();
     }
 
     // Update is called once per frame
@@ -37,6 +37,8 @@ public class Enemy : MonoBehaviour {
             }
 
             weapon.SetAimDirection(aimDirection);
+
+            weapon.Fire();
 
         }
     }

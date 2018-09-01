@@ -13,7 +13,13 @@ public class Player : MonoBehaviour {
     bool facingRight = true;
     //Vector2 mouseWorldPoint;
     Vector2 aimDirection;
-    public Weapon ballGlove;
+    public Glove ballGlove;
+    bool gloveOpen = false;
+
+
+    // bullets caught
+    int numBulletsCaught = 0;
+
 
     // Use this for initialization
     void Start () {
@@ -37,6 +43,16 @@ public class Player : MonoBehaviour {
             
             SwapFacing();
         }
+
+        if(Input.GetButtonDown("Fire1"))
+        {
+            gloveOpen = true;
+        }
+        if(Input.GetButtonUp("Fire1"))
+        {
+            gloveOpen = false;
+        }
+        ballGlove.SetGloveOpen(gloveOpen);
     }
 
     void FixedUpdate()
@@ -48,5 +64,10 @@ public class Player : MonoBehaviour {
     {
         transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
         facingRight = !facingRight;
+    }
+
+    public void CatchBullet()
+    {
+        numBulletsCaught++;
     }
 }
