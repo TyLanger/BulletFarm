@@ -7,6 +7,8 @@ public class ButterflyNet : Weapon {
 
     SpriteRenderer spriteRenderer;
     public GameObject netVisuals;
+    public Sprite[] swooshes;
+    public SpriteRenderer swoosh;
 
     bool swinging = false;
 
@@ -73,7 +75,7 @@ public class ButterflyNet : Weapon {
         // dictates how fast the net swings
         // lower is faster
         int numIterations = 15;
-
+        swoosh.enabled = true;
         for (int i = 0; i < numIterations; i++)
         {
             base.SetAimDirection(Vector3.Lerp(startDir, endDir, (float)i / (float)numIterations));
@@ -87,8 +89,34 @@ public class ButterflyNet : Weapon {
             {
                 transform.localScale = Vector3.one;
             }
+
+            //update the swoosh
+            if(i < 5)
+            {
+                swoosh.sprite = swooshes[0];
+            }
+            else if (i < 9)
+            {
+                swoosh.sprite = swooshes[1];
+            }
+            else if(i < 13)
+            {
+                swoosh.sprite = swooshes[2];
+            }
+            else if(i < 15)
+            {
+                swoosh.sprite = swooshes[3];
+            }
+            else
+            {
+                swoosh.sprite = swooshes[0];
+            }
+
             yield return new WaitForFixedUpdate();
         }
+        swoosh.sprite = swooshes[0];
+        swoosh.enabled = false;
+
         StopSwing();
     }
 
