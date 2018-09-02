@@ -65,7 +65,7 @@ public class Bullet : MonoBehaviour {
     void TurnInBulletsToBoss()
     {
         // fire bullets down from the top of the screen
-        transform.position = topOfScreenEntrance;
+        transform.position = topOfScreenEntrance + new Vector3(Random.Range(-0.05f, 0.05f), 0, 0);
 
         turningIn = false;
         transform.rotation = Quaternion.Euler(0, 0, 180);

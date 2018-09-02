@@ -56,7 +56,7 @@ public class ButterflyNet : Weapon {
         if (numBulletsCaught > 0)
         {
             //Destroy(caughtBullet.gameObject);
-            caughtBullet.transform.position = bulletStoragePoint.position;
+            caughtBullet.transform.position = bulletStoragePoint.position + new Vector3(Random.Range(-0.05f, 0.05f), 0, 0);
 
             // store bullet before you increment the score
             StoreBullet(caughtBullet);
@@ -124,7 +124,7 @@ public class ButterflyNet : Weapon {
             }
             else
             {
-                col.transform.position = bulletStoragePoint.position;
+                col.transform.position = bulletStoragePoint.position + new Vector3(Random.Range(-0.05f, 0.05f), 0, 0);
                 StoreBullet(col.gameObject);
                 //Destroy(col.gameObject);
             }

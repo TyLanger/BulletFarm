@@ -63,7 +63,7 @@ public class Glove : Weapon {
         //player.CatchBullet();
         puttingAwayBullet = false;
         //Destroy(caughtBullet);
-        caughtBullet.transform.position = bulletStoragePoint.position;
+        caughtBullet.transform.position = bulletStoragePoint.position + new Vector3(Random.Range(-0.05f, 0.05f), 0, 0);
     }
 
     public void CatchBullet()

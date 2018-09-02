@@ -146,7 +146,7 @@ public class Player : MonoBehaviour {
 
     void CatchBullet(int numBullets)
     {
-        Debug.Log("Caught " + numBullets + " bullets");
+        //Debug.Log("Caught " + numBullets + " bullets");
         numBulletsCaught += numBullets;
         backpackRenderer.sprite = backPackOpenSprite;
         bulletsCollectedText.text = (numBulletsCaught + (ammoCrates * 25)).ToString();
@@ -203,7 +203,10 @@ public class Player : MonoBehaviour {
 
     public void StoreBullet(GameObject bullet)
     {
-        bulletReference[numBulletsCaught] = bullet;
+        if (numBulletsCaught < bulletReference.Length)
+        {
+            bulletReference[numBulletsCaught] = bullet;
+        }
         CatchBullet();
     }
 
@@ -218,6 +221,8 @@ public class Player : MonoBehaviour {
         {
             bulletReference[i].GetComponent<Bullet>().TurnInBullets();
             yield return new WaitForFixedUpdate();
+            yield return new WaitForFixedUpdate();
+
         }
 
         yield return null;
