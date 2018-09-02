@@ -15,7 +15,7 @@ public class CameraFollow : MonoBehaviour {
     public float bottomBound;
 
     // camera can go out of the bounds
-    bool unHinged = false;
+    bool unHinged = true;
 	
 	// Update is called once per frame
 	void FixedUpdate () {

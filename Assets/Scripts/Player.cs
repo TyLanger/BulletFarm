@@ -21,6 +21,8 @@ public class Player : MonoBehaviour {
     int numBulletsCaught = 0;
     public UnityEngine.UI.Text bulletsCollectedText;
     int ammoCrates = 0;
+    int totalBulletsHandedIn = 0;
+
 
     // backpack open/close
     public GameObject backpackVisuals;
@@ -39,18 +41,28 @@ public class Player : MonoBehaviour {
 
     // alternate implementation
     public ButterflyNet bNet;
+    public SpriteRenderer bNetVisuals;
 
     // health
     int maxNumBulletsHit = 3;
     int currentNumBulletsHit = 0;
     GameObject[] bulletsHit;
-    bool canMove = true;
+    bool canMove = false;
 
     public Vector3 inBetweenPoint;
     public Transform bulletPoint;
     public GameObject fadeScreen;
 
     GameObject[] bulletReference;
+    GameObject[] ammoCrateReference;
+
+    public Vector3 spawnPoint;
+    public UnityEngine.UI.Text chatText;
+    bool gloveEnabled = false;
+    bool netEnabled = false;
+
+    public GameObject[] netEnemies;
+    public GameObject[] finalEnemies;
 
     // Use this for initialization
     void Start () {
@@ -60,7 +72,11 @@ public class Player : MonoBehaviour {
         backpackCloseSprite = backpackRenderer.sprite;
 
         bulletReference = new GameObject[25];
-	}
+        // only 7 crates in game
+        ammoCrateReference = new GameObject[7];
+
+        StartCoroutine(Intro());
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -85,23 +101,28 @@ public class Player : MonoBehaviour {
 
         if (canMove)
         {
-            // Use ball glove with left click
-            if (Input.GetButtonDown("Fire1"))
+            if (gloveEnabled)
             {
-                gloveOpen = true;
-            }
-            if (Input.GetButtonUp("Fire1"))
-            {
-                gloveOpen = false;
-            }
-            ballGlove.SetGloveOpen(gloveOpen);
-
-            // Use butterfly net with right click
-            if (Input.GetButtonDown("Fire2"))
-            {
-                if (!usingButterflyNet)
+                // Use ball glove with left click
+                if (Input.GetButtonDown("Fire1"))
                 {
-                    SwingBNet();
+                    gloveOpen = true;
+                }
+                if (Input.GetButtonUp("Fire1"))
+                {
+                    gloveOpen = false;
+                }
+                ballGlove.SetGloveOpen(gloveOpen);
+            }
+            if (netEnabled)
+            {
+                // Use butterfly net with right click
+                if (Input.GetButtonDown("Fire2"))
+                {
+                    if (!usingButterflyNet)
+                    {
+                        SwingBNet();
+                    }
                 }
             }
         }
@@ -133,8 +154,9 @@ public class Player : MonoBehaviour {
         facingRight = !facingRight;
     }
 
-    public void GetAmmoCrate()
+    public void GetAmmoCrate(GameObject crate)
     {
+        ammoCrateReference[ammoCrates] = crate;
         ammoCrates++;
         CatchBullet(0);
     }
@@ -193,10 +215,177 @@ public class Player : MonoBehaviour {
     }
     */
 
+    IEnumerator Intro()
+    {
+        chatText.text = "Howdy kid. So you're gonna be working for me here. It's an easy job, dontcha worry.";
+
+        // click to advance
+        while(!Input.GetButtonDown("Fire1"))
+        {
+            yield return new WaitForFixedUpdate();
+        }
+        chatText.text = "";
+        yield return new WaitForFixedUpdate();
+
+        chatText.text = "All you gotta do is go into this here saloon and pick up some bullets for me." ;
+
+        while (!Input.GetButtonDown("Fire1"))
+        {
+            yield return new WaitForFixedUpdate();
+        }
+        chatText.text = "";
+        yield return new WaitForFixedUpdate();
+
+        chatText.text = "Easy stuff. So easy a child such as yourself could do it.";
+
+        while (!Input.GetButtonDown("Fire1"))
+        {
+            yield return new WaitForFixedUpdate();
+        }
+        chatText.text = "";
+        yield return new WaitForFixedUpdate();
+
+        chatText.text = "Those thugs in there may give you a hard time. Here, take this ball glove. Kids like ball, don't they?";
+        gloveEnabled = true;
+
+        EnableWeapons();
+
+        while (!Input.GetButtonDown("Fire1"))
+        {
+            yield return new WaitForFixedUpdate();
+        }
+        chatText.text = "";
+        yield return new WaitForFixedUpdate();
+
+        Respawn();
+
+        yield return null;
+    }
+
+    IEnumerator TalkToBoss(int bulletsCaughtThisRound)
+    {
+        chatText.text = "Kid, you brought me "+bulletsCaughtThisRound+" bullets which brings your total up to " + totalBulletsHandedIn.ToString();
+
+        while (!Input.GetButtonDown("Fire1"))
+        {
+            yield return new WaitForFixedUpdate();
+        }
+        chatText.text = "";
+        yield return new WaitForFixedUpdate();
+
+
+        if (!netEnabled)
+        {
+            if (totalBulletsHandedIn > 100)
+            {
+                chatText.text = "That's good and all, but dontcha think a child as big as you should be pulling in more bullets?";
+
+                while (!Input.GetButtonDown("Fire1"))
+                {
+                    yield return new WaitForFixedUpdate();
+                }
+                chatText.text = "";
+                yield return new WaitForFixedUpdate();
+
+                chatText.text = "Here, try out this here butterfly net. You oughta be able to catch twice as many bullets with that.";
+                netEnabled = true;
+                EnableWeapons();
+            }
+            else
+            {
+                chatText.text = "Kid, these numbers just ain't good enough. Don't think I'd treat you any different just cuz you is a kid";
+                while (!Input.GetButtonDown("Fire1"))
+                {
+                    yield return new WaitForFixedUpdate();
+                }
+                chatText.text = "";
+                yield return new WaitForFixedUpdate();
+
+                chatText.text = "I treat all of my employees the same";
+            }
+        }
+        else
+        {
+            // you have the net. Now what?
+
+        }
+
+        while (!Input.GetButtonDown("Fire1"))
+        {
+            yield return new WaitForFixedUpdate();
+        }
+        chatText.text = "";
+        yield return new WaitForFixedUpdate();
+        chatText.text = "Now go out and get me more bullets";
+
+        while (!Input.GetButtonDown("Fire1"))
+        {
+            yield return new WaitForFixedUpdate();
+        }
+        chatText.text = "";
+        yield return new WaitForFixedUpdate();
+
+        Respawn();
+    }
+
+    void EnableWeapons()
+    {
+        if (gloveEnabled)
+        {
+            ballGlove.GetComponent<SpriteRenderer>().enabled = true;
+        }
+        if (netEnabled)
+        {
+            bNet.GetComponent<SpriteRenderer>().enabled = true;
+            bNetVisuals.enabled = true;
+        }
+    }
+
+    void SetupEnemies()
+    {
+
+        if(netEnabled)
+        {
+
+            // enable these enemies
+            for (int i = 0; i < netEnemies.Length; i++)
+            {
+                netEnemies[i].SetActive(true);
+            }
+        }
+
+    }
+
     void Respawn()
     {
+        SetupEnemies();
+        // Destroy the bullets given to the boss
+        for (int i = 0; i < bulletReference.Length; i++)
+        {
+            if (bulletReference[i] != null)
+            {
+                Destroy(bulletReference[i].gameObject);
+            }
+            else
+            {
+                // got all the bullets in the array
+                break;
+            }
+        }
+
+        for (int i = 0; i < ammoCrates; i++)
+        {
+            ammoCrateReference[i].GetComponent<AmmoCrate>().ResetCrate();
+        }
+
+        //Debug.Break();
         canMove = true;
         // tp player
+        transform.position = spawnPoint;
+        numBulletsCaught = 0;
+        ammoCrates = 0;
+        currentNumBulletsHit = 0;
+
         Camera.main.GetComponent<CameraFollow>().UnhingeCamera(false);
         fadeScreen.GetComponent<SpriteRenderer>().color -= new Color(0, 0, 0, 1);
     }
@@ -231,28 +420,66 @@ public class Player : MonoBehaviour {
             yield return new WaitForFixedUpdate();
 
         }
+        for (int i = 0; i < ammoCrates; i++)
+        {
+            ammoCrateReference[i].GetComponent<AmmoCrate>().HandInCrates();
+            yield return new WaitForFixedUpdate();
+            yield return new WaitForFixedUpdate();
 
-        yield return null;
+        }
+
+        chatText.text = "Those bullets embedded in your small body are good too";
+
+        // take all bullets off your body
+        var hitBullets = GetComponentsInChildren<Bullet>();
+        for (int i = 0; i < hitBullets.Length; i++)
+        {
+            hitBullets[i].transform.parent = null;
+            hitBullets[i].TurnInBullets();
+            yield return new WaitForFixedUpdate();
+            yield return new WaitForFixedUpdate();
+            CatchBullet();
+        }
+
+        while (!Input.GetButtonDown("Fire1"))
+        {
+            yield return new WaitForFixedUpdate();
+        }
+        chatText.text = "";
+        yield return new WaitForFixedUpdate();
+
+        //Debug.Log(numBulletsCaught);
+        totalBulletsHandedIn += (numBulletsCaught + (ammoCrates * 25));
+        //Debug.Log(totalBulletsHandedIn);
+
+        for (int i = 0; i < hitBullets.Length; i++)
+        {
+            Destroy(hitBullets[i].gameObject);
+        }
+        StartCoroutine(TalkToBoss((numBulletsCaught + (ammoCrates * 25))));
     }
 
     IEnumerator Death()
     {
-
-        // play death animation
-
-        // fade to black
-        SpriteRenderer sr = fadeScreen.GetComponent<SpriteRenderer>();
-        while(sr.color.a < 0.95f)
+        if (canMove)
         {
-            sr.color += new Color(0, 0, 0, 0.01f);
-            yield return new WaitForFixedUpdate();
+            canMove = false;
+            // play death animation
+
+            // fade to black
+            SpriteRenderer sr = fadeScreen.GetComponent<SpriteRenderer>();
+            while (sr.color.a < 0.95f)
+            {
+                sr.color += new Color(0, 0, 0, 0.01f);
+                yield return new WaitForFixedUpdate();
+            }
+
+            transform.position = inBetweenPoint;
+            Camera.main.GetComponent<CameraFollow>().UnhingeCamera(true);
+
+            yield return new WaitForSeconds(5);
+
+            StartCoroutine(GiveBullets());
         }
-
-        transform.position = inBetweenPoint;
-        Camera.main.GetComponent<CameraFollow>().UnhingeCamera(true);
-
-        yield return new WaitForSeconds(5);
-
-        StartCoroutine(GiveBullets());
     }
 }

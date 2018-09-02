@@ -50,14 +50,17 @@ public class Bullet : MonoBehaviour {
                 col.gameObject.GetComponent<Player>().HitByBullet(gameObject);
                 CaughtBullet();
             }
-            if(col.transform.tag == "Catcher")
+            else if(col.transform.tag == "Catcher")
             {
                 // hit something that can catch bullets
                 CaughtBullet();
             }
-            if(col.transform.tag == "Wall")
+            else if(col.transform.tag == "Wall")
             {
-                DestroyBullet();
+                // seem to have problems where the bullet hit the glove and is caught
+                // then hits a wall and is destroyed
+                CaughtBullet();
+                Invoke("DestroyBullet", 3);
             }
         }
     }
