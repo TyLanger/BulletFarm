@@ -10,6 +10,8 @@ public class Player : MonoBehaviour {
     float currentMoveSpeed;
     Vector3 moveInput;
 
+    public GameObject reticle;
+
     bool facingRight = true;
     //Vector2 mouseWorldPoint;
     Vector2 aimDirection;
@@ -80,6 +82,7 @@ public class Player : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        Cursor.visible = false;
         bulletsHit = new GameObject[maxNumBulletsHit];
 		currentMoveSpeed = baseMoveSpeed;
         backpackRenderer = backpackVisuals.GetComponent<SpriteRenderer>();
@@ -99,6 +102,7 @@ public class Player : MonoBehaviour {
 
         // get the world position of the mouse
         // then calculate the direction the mouse is aiming relative to the player
+        reticle.transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10);
         aimDirection = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position);
         aimDirection.Normalize();
 
