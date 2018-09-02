@@ -63,6 +63,19 @@ public class Player : MonoBehaviour {
 
     public GameObject[] netEnemies;
     public GameObject[] finalEnemies;
+    bool endGame = false;
+    public GameObject endJohhny;
+    public SpriteRenderer Doug;
+    public Sprite deadDoug;
+    public GameObject dougHat;
+
+    public Transform sunsetPoint;
+    public Transform sunset;
+    bool rideIntoSunset = false;
+    public UnityEngine.UI.Text endText;
+    public UnityEngine.UI.Image bulletImage;
+    public GameObject endGameFadeScreen;
+
 
     // Use this for initialization
     void Start () {
@@ -133,6 +146,37 @@ public class Player : MonoBehaviour {
         if (canMove)
         {
             transform.position = Vector3.MoveTowards(transform.position, transform.position + moveInput, currentMoveSpeed * Time.fixedDeltaTime);
+        }
+
+        if(rideIntoSunset)
+        {
+            // walk slowly into the sunset
+            transform.position = Vector3.MoveTowards(transform.position, sunset.position, currentMoveSpeed * 0.04f * Time.fixedDeltaTime);
+            // shrink as you walk
+            transform.localScale = Vector3.one * Mathf.Lerp(0.5f, 1, (Vector3.Distance(transform.position, sunset.position) / Vector3.Distance(sunsetPoint.position, sunset.position)));
+
+            if (Vector3.Distance(transform.position, sunset.position) < 0.1f)
+            {
+                // end game
+                rideIntoSunset = false;
+                StartCoroutine(EndGame());
+            }
+        }
+    }
+
+    IEnumerator EndGame()
+    {
+        SpriteRenderer sr = endGameFadeScreen.GetComponent<SpriteRenderer>();
+        while (sr.color.a < 0.95f)
+        {
+            sr.color += new Color(0, 0, 0, 0.01f);
+            yield return new WaitForFixedUpdate();
+        }
+
+        while(endText.color.a < 0.95f)
+        {
+            endText.color += new Color(0, 0, 0, 0.01f);
+            yield return new WaitForFixedUpdate();
         }
     }
 
@@ -257,6 +301,22 @@ public class Player : MonoBehaviour {
         chatText.text = "";
         yield return new WaitForFixedUpdate();
 
+        chatText.text = "It's a children's mitt to fit your small hands so it can only fit one bullet at a time.";
+        while (!Input.GetButtonDown("Fire1"))
+        {
+            yield return new WaitForFixedUpdate();
+        }
+        chatText.text = "";
+        yield return new WaitForFixedUpdate();
+
+        chatText.text = "Hold left click to open the ball glove to catch stuff.";
+        while (!Input.GetButtonDown("Fire1"))
+        {
+            yield return new WaitForFixedUpdate();
+        }
+        chatText.text = "";
+        yield return new WaitForFixedUpdate();
+
         Respawn();
 
         yield return null;
@@ -264,68 +324,187 @@ public class Player : MonoBehaviour {
 
     IEnumerator TalkToBoss(int bulletsCaughtThisRound)
     {
-        chatText.text = "Kid, you brought me "+bulletsCaughtThisRound+" bullets which brings your total up to " + totalBulletsHandedIn.ToString();
-
-        while (!Input.GetButtonDown("Fire1"))
+        if (!endGame)
         {
-            yield return new WaitForFixedUpdate();
-        }
-        chatText.text = "";
-        yield return new WaitForFixedUpdate();
+            chatText.text = "Kid, you brought me " + bulletsCaughtThisRound + " bullets which brings your total up to " + totalBulletsHandedIn.ToString();
 
-
-        if (!netEnabled)
-        {
-            if (totalBulletsHandedIn > 100)
+            while (!Input.GetButtonDown("Fire1"))
             {
-                chatText.text = "That's good and all, but dontcha think a child as big as you should be pulling in more bullets?";
+                yield return new WaitForFixedUpdate();
+            }
+            chatText.text = "";
+            yield return new WaitForFixedUpdate();
 
-                while (!Input.GetButtonDown("Fire1"))
+
+            if (!netEnabled)
+            {
+                if (totalBulletsHandedIn > 75)
                 {
+                    chatText.text = "That's good and all, but dontcha think a child as big as you should be pulling in more bullets?";
+
+                    while (!Input.GetButtonDown("Fire1"))
+                    {
+                        yield return new WaitForFixedUpdate();
+                    }
+                    chatText.text = "";
+                    yield return new WaitForFixedUpdate();
+
+                    chatText.text = "Here, try out this here butterfly net. You oughta be able to catch twice as many bullets with that.";
+                    netEnabled = true;
+                    EnableWeapons();
+
+                    while (!Input.GetButtonDown("Fire1"))
+                    {
+                        yield return new WaitForFixedUpdate();
+                    }
+                    chatText.text = "";
+                    yield return new WaitForFixedUpdate();
+
+                    chatText.text = "Right click to swing the net";
+                    while (!Input.GetButtonDown("Fire1"))
+                    {
+                        yield return new WaitForFixedUpdate();
+                    }
+                    chatText.text = "";
                     yield return new WaitForFixedUpdate();
                 }
-                chatText.text = "";
-                yield return new WaitForFixedUpdate();
+                else
+                {
+                    chatText.text = "Kid, these numbers just ain't good enough. Don't think I'd treat you any different just cuz you is a kid";
+                    while (!Input.GetButtonDown("Fire1"))
+                    {
+                        yield return new WaitForFixedUpdate();
+                    }
+                    chatText.text = "";
+                    yield return new WaitForFixedUpdate();
 
-                chatText.text = "Here, try out this here butterfly net. You oughta be able to catch twice as many bullets with that.";
-                netEnabled = true;
-                EnableWeapons();
+                    chatText.text = "Get outta here with your child labour laws. I treat all of my employees the same";
+                }
             }
             else
             {
-                chatText.text = "Kid, these numbers just ain't good enough. Don't think I'd treat you any different just cuz you is a kid";
-                while (!Input.GetButtonDown("Fire1"))
+                // you have the net. Now what?
+                if (totalBulletsHandedIn > 350)
                 {
+                    endGame = true;
+
+                    chatText.text = "\"Who am I selling these bullets to if the only people in town are these thugs and a bunch of kids?\"";
+                    while (!Input.GetButtonDown("Fire1"))
+                    {
+                        yield return new WaitForFixedUpdate();
+                    }
+                    chatText.text = "";
+                    yield return new WaitForFixedUpdate();
+
+                    chatText.text = "Good question, kid! Why, to the thugs of course! I sell them the bullets, then you go get them for me.";
+
+                    while (!Input.GetButtonDown("Fire1"))
+                    {
+                        yield return new WaitForFixedUpdate();
+                    }
+                    chatText.text = "";
+                    yield return new WaitForFixedUpdate();
+
+                    chatText.text = "It's a great business we've got going here";
+
+                    while (!Input.GetButtonDown("Fire1"))
+                    {
+                        yield return new WaitForFixedUpdate();
+                    }
+                    chatText.text = "";
                     yield return new WaitForFixedUpdate();
                 }
-                chatText.text = "";
-                yield return new WaitForFixedUpdate();
-
-                chatText.text = "I treat all of my employees the same";
             }
+
+            while (!Input.GetButtonDown("Fire1"))
+            {
+                yield return new WaitForFixedUpdate();
+            }
+            chatText.text = "";
+            yield return new WaitForFixedUpdate();
+            chatText.text = "Now go out and get me more bullets";
+
+            while (!Input.GetButtonDown("Fire1"))
+            {
+                yield return new WaitForFixedUpdate();
+            }
+            chatText.text = "";
+            yield return new WaitForFixedUpdate();
+
+            Respawn();
         }
         else
         {
-            // you have the net. Now what?
+            chatText.text = "Kid, I'm Johhny. We killed that crooked Doug guy you called your boss.";
 
-        }
-
-        while (!Input.GetButtonDown("Fire1"))
-        {
+            while (!Input.GetButtonDown("Fire1"))
+            {
+                yield return new WaitForFixedUpdate();
+            }
+            chatText.text = "";
             yield return new WaitForFixedUpdate();
-        }
-        chatText.text = "";
-        yield return new WaitForFixedUpdate();
-        chatText.text = "Now go out and get me more bullets";
 
-        while (!Input.GetButtonDown("Fire1"))
-        {
+            chatText.text = "He was playing us both for fools. Without him around, we're both free.";
+
+            while (!Input.GetButtonDown("Fire1"))
+            {
+                yield return new WaitForFixedUpdate();
+            }
+            chatText.text = "";
             yield return new WaitForFixedUpdate();
-        }
-        chatText.text = "";
-        yield return new WaitForFixedUpdate();
 
-        Respawn();
+            chatText.text = "Me and the boys are thinking about a change of pace.";
+
+            while (!Input.GetButtonDown("Fire1"))
+            {
+                yield return new WaitForFixedUpdate();
+            }
+            chatText.text = "";
+            yield return new WaitForFixedUpdate();
+
+            chatText.text = "Maybe we'll leave this replica wild west town and rejoin the modern day. We sure do miss video games.";
+
+            while (!Input.GetButtonDown("Fire1"))
+            {
+                yield return new WaitForFixedUpdate();
+            }
+            chatText.text = "";
+            yield return new WaitForFixedUpdate();
+
+            chatText.text = "You're welcome to join us, kid.";
+
+            while (!Input.GetButtonDown("Fire1"))
+            {
+                yield return new WaitForFixedUpdate();
+            }
+            chatText.text = "";
+            yield return new WaitForFixedUpdate();
+
+            chatText.text = "\"No\"? Well, suit yourself. Go on then, ride off into that there sunset, cowboy.";
+
+            while (!Input.GetButtonDown("Fire1"))
+            {
+                yield return new WaitForFixedUpdate();
+            }
+            chatText.text = "";
+            yield return new WaitForFixedUpdate();
+
+            transform.position = sunsetPoint.position;
+            rideIntoSunset = true;
+            Camera.main.GetComponent<CameraFollow>().target = sunsetPoint.gameObject;
+            bulletsCollectedText.gameObject.SetActive(false);
+            bulletImage.gameObject.SetActive(false);
+        }
+    }
+
+    void EndGameSetup()
+    {
+        // kill Doug
+        // spawn Johhny in the end screen
+
+        endJohhny.SetActive(true);
+        Doug.sprite = deadDoug;
+        dougHat.SetActive(true);
     }
 
     void EnableWeapons()
@@ -336,7 +515,7 @@ public class Player : MonoBehaviour {
         }
         if (netEnabled)
         {
-            bNet.GetComponent<SpriteRenderer>().enabled = true;
+            //bNet.GetComponent<SpriteRenderer>().enabled = true;
             bNetVisuals.enabled = true;
         }
     }
@@ -352,6 +531,14 @@ public class Player : MonoBehaviour {
             {
                 netEnemies[i].SetActive(true);
             }
+        }
+        if(endGame)
+        {
+            for (int i = 0; i < finalEnemies.Length; i++)
+            {
+                finalEnemies[i].SetActive(false);
+            }
+            EndGameSetup();
         }
 
     }
@@ -427,8 +614,10 @@ public class Player : MonoBehaviour {
             yield return new WaitForFixedUpdate();
 
         }
-
-        chatText.text = "Those bullets embedded in your small body are good too";
+        if (!endGame)
+        {
+            chatText.text = "Those bullets embedded in your small body are good too";
+        }
 
         // take all bullets off your body
         var hitBullets = GetComponentsInChildren<Bullet>();
