@@ -19,6 +19,8 @@ public class Shotgun : Gun {
             if (currentNumBullets > 0)
             {
                 currentNumBullets -= bulletsPerShot;
+                ShootSound();
+
 
                 for (int i = 0; i < bulletsPerShot; i++)
                 {

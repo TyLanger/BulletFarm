@@ -76,6 +76,7 @@ public class Player : MonoBehaviour {
     public UnityEngine.UI.Image bulletImage;
     public GameObject endGameFadeScreen;
 
+    AudioSource aSource;
 
     // Use this for initialization
     void Start () {
@@ -87,6 +88,7 @@ public class Player : MonoBehaviour {
         bulletReference = new GameObject[25];
         // only 7 crates in game
         ammoCrateReference = new GameObject[7];
+        aSource = GetComponent<AudioSource>();
 
         StartCoroutine(Intro());
     }
@@ -226,6 +228,12 @@ public class Player : MonoBehaviour {
 
     public void HitByBullet(GameObject col)
     {
+
+        if (!aSource.isPlaying)
+        {
+            aSource.Play();
+        }
+
         if (currentNumBulletsHit < maxNumBulletsHit)
         {
             // only add to the array until it's full

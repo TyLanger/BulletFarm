@@ -13,10 +13,13 @@ public class Gun : Weapon {
     protected float timeOfNextShot = 0;
     public float timeToReload = 3;
 
+    AudioSource aSource;
+
     protected override void Start()
     {
         base.Start();
         currentNumBullets = clipSize;
+        aSource = GetComponent<AudioSource>();
     }
 
     protected void Reload()
@@ -32,6 +35,11 @@ public class Gun : Weapon {
         GetComponent<SpriteRenderer>().color = Color.white;
     }
 
+    protected void ShootSound()
+    {
+        aSource.Play();
+    }
+
     public virtual void Fire()
     {
         if(Time.time > timeOfNextShot)
@@ -43,6 +51,7 @@ public class Gun : Weapon {
                 currentNumBullets--;
 
                 Instantiate(bullet, transform.position, transform.rotation);
+                ShootSound();
             }
             else
             {
