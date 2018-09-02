@@ -20,6 +20,8 @@ public class ButterflyNet : Weapon {
     GameObject caughtBullet;
     public Transform netPosition;
 
+    public Transform bulletStoragePoint;
+
     protected override void Start()
     {
         base.Start();
@@ -53,8 +55,14 @@ public class ButterflyNet : Weapon {
         // updates bullets caught, if any
         if (numBulletsCaught > 0)
         {
-            Destroy(caughtBullet.gameObject);
-            player.CatchBullet(numBulletsCaught);
+            //Destroy(caughtBullet.gameObject);
+            caughtBullet.transform.position = bulletStoragePoint.position;
+
+            // store bullet before you increment the score
+            StoreBullet(caughtBullet);
+
+            // catch bullet is now rolled into storebullet
+            //player.CatchBullet(numBulletsCaught);
             numBulletsCaught = 0;
         }
     }
@@ -116,7 +124,9 @@ public class ButterflyNet : Weapon {
             }
             else
             {
-                Destroy(col.gameObject);
+                col.transform.position = bulletStoragePoint.position;
+                StoreBullet(col.gameObject);
+                //Destroy(col.gameObject);
             }
             numBulletsCaught++;
         }

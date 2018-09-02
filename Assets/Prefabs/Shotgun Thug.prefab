@@ -133,7 +133,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1857801763949948}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.4, y: 0.167, z: 0}
+  m_LocalPosition: {x: 0.5600822, y: -1.1732824, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4253166721388136}
@@ -282,11 +282,12 @@ MonoBehaviour:
   orbitDistance: 0.15
   parent: {fileID: 4064804121844484}
   aimDirection: {x: 0, y: 0}
-  bullet: {fileID: 1564923495099912, guid: 9b62fd818f7998940bde7c124696f04d, type: 2}
+  bullet: {fileID: 1050469200401144, guid: 5ba9a41986fc70c45b296ea9e17743f1, type: 2}
   clipSize: 6
   timeBetweenShots: 0.5
   timeToReload: 2
   bulletsPerShot: 3
+  bulletAngle: 3
 --- !u!114 &114375888011765598
 MonoBehaviour:
   m_ObjectHideFlags: 1

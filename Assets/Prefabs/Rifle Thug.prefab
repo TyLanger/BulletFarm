@@ -176,7 +176,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1190196811063466}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.8, y: 0.14, z: 0}
+  m_LocalPosition: {x: -1.859, y: 1.277, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4079970887345326}
@@ -279,6 +279,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b480b0f3d32a5a43b84a2ce3ae0c12d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  missAmount: 0.2
 --- !u!114 &114526789937766228
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -293,7 +294,7 @@ MonoBehaviour:
   orbitDistance: 0.15
   parent: {fileID: 4844304330169404}
   aimDirection: {x: 0, y: 0}
-  bullet: {fileID: 1564923495099912, guid: 9b62fd818f7998940bde7c124696f04d, type: 2}
+  bullet: {fileID: 1642756328171972, guid: 23d764692657fb74c9e5e1676c1ce7a6, type: 2}
   clipSize: 10
   timeBetweenShots: 0.7
   timeToReload: 4

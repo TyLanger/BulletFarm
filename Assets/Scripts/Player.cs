@@ -19,6 +19,8 @@ public class Player : MonoBehaviour {
 
     // bullets caught
     int numBulletsCaught = 0;
+    public UnityEngine.UI.Text bulletsCollectedText;
+    int ammoCrates = 0;
 
     // backpack open/close
     public GameObject backpackVisuals;
@@ -38,18 +40,26 @@ public class Player : MonoBehaviour {
     // alternate implementation
     public ButterflyNet bNet;
 
+    // health
+    int maxNumBulletsHit = 3;
+    int currentNumBulletsHit = 0;
+    GameObject[] bulletsHit;
+    bool canMove = true;
 
-    int maxNumBulletsCaught = 3;
-    int currentNumBulletsCaught = 0;
-    GameObject[] bulletsCaught;
+    public Vector3 inBetweenPoint;
+    public Transform bulletPoint;
+    public GameObject fadeScreen;
 
+    GameObject[] bulletReference;
 
     // Use this for initialization
     void Start () {
-        bulletsCaught = new GameObject[maxNumBulletsCaught];
+        bulletsHit = new GameObject[maxNumBulletsHit];
 		currentMoveSpeed = baseMoveSpeed;
         backpackRenderer = backpackVisuals.GetComponent<SpriteRenderer>();
         backpackCloseSprite = backpackRenderer.sprite;
+
+        bulletReference = new GameObject[25];
 	}
 	
 	// Update is called once per frame
@@ -73,30 +83,36 @@ public class Player : MonoBehaviour {
             }
         }
 
-        // Use ball glove with left click
-        if(Input.GetButtonDown("Fire1"))
+        if (canMove)
         {
-            gloveOpen = true;
-        }
-        if(Input.GetButtonUp("Fire1"))
-        {
-            gloveOpen = false;
-        }
-        ballGlove.SetGloveOpen(gloveOpen);
-
-        // Use butterfly net with right click
-        if(Input.GetButtonDown("Fire2"))
-        {
-            if (!usingButterflyNet)
+            // Use ball glove with left click
+            if (Input.GetButtonDown("Fire1"))
             {
-                SwingBNet();
+                gloveOpen = true;
+            }
+            if (Input.GetButtonUp("Fire1"))
+            {
+                gloveOpen = false;
+            }
+            ballGlove.SetGloveOpen(gloveOpen);
+
+            // Use butterfly net with right click
+            if (Input.GetButtonDown("Fire2"))
+            {
+                if (!usingButterflyNet)
+                {
+                    SwingBNet();
+                }
             }
         }
     }
 
     void FixedUpdate()
     {
-        transform.position = Vector3.MoveTowards(transform.position, transform.position + moveInput, currentMoveSpeed * Time.fixedDeltaTime);
+        if (canMove)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, transform.position + moveInput, currentMoveSpeed * Time.fixedDeltaTime);
+        }
     }
 
     void SwingBNet()
@@ -117,15 +133,23 @@ public class Player : MonoBehaviour {
         facingRight = !facingRight;
     }
 
-    public void CatchBullet()
+    public void GetAmmoCrate()
+    {
+        ammoCrates++;
+        CatchBullet(0);
+    }
+
+    void CatchBullet()
     {
         CatchBullet(1);
     }
 
-    public void CatchBullet(int numBullets)
+    void CatchBullet(int numBullets)
     {
+        Debug.Log("Caught " + numBullets + " bullets");
         numBulletsCaught += numBullets;
         backpackRenderer.sprite = backPackOpenSprite;
+        bulletsCollectedText.text = (numBulletsCaught + (ammoCrates * 25)).ToString();
         Invoke("BackpackClose", 0.5f);
     }
 
@@ -134,27 +158,89 @@ public class Player : MonoBehaviour {
         backpackRenderer.sprite = backpackCloseSprite;
     }
 
+    public void HitByBullet(GameObject col)
+    {
+        if (currentNumBulletsHit < maxNumBulletsHit)
+        {
+            // only add to the array until it's full
+            bulletsHit[currentNumBulletsHit] = col.gameObject;
+        }
+
+        col.transform.parent = transform;
+        col.transform.position = Vector3.MoveTowards(col.transform.position, transform.position, 3 * Time.fixedDeltaTime);
+
+        // remove the rigidbody so when you push against objects, the bullets don't fly off on their own
+        Destroy(col.gameObject.GetComponent<Rigidbody2D>());
+        currentNumBulletsHit++;
+        if (currentNumBulletsHit > maxNumBulletsHit)
+        {
+            // you died
+            StartCoroutine(Death());
+        }
+    }
+
+    // player thinks it's hit by a bullet when one of its children is hit by a bullet
+    // i.e. the glove and net
+    /*
     void OnTriggerEnter2D(Collider2D col)
     {
         if (col.tag == "Bullet")
         {
-            if (currentNumBulletsCaught < maxNumBulletsCaught)
-            {
-                // only add to the array until it's full
-                bulletsCaught[currentNumBulletsCaught] = col.gameObject;
-            }
-
-            col.transform.parent = transform;
-            col.transform.position = Vector3.MoveTowards(col.transform.position, transform.position, 3 * Time.fixedDeltaTime);
-
-            // remove the rigidbody so when you push against objects, the bullets don't fly off on their own
-            Destroy(col.gameObject.GetComponent<Rigidbody2D>());
-            currentNumBulletsCaught++;
-            if (currentNumBulletsCaught > maxNumBulletsCaught)
-            {
-                // you died
-            }
+            //Debug.Log("Hit by bullet");
+            
 
         }
+    }
+    */
+
+    void Respawn()
+    {
+        canMove = true;
+        // tp player
+        Camera.main.GetComponent<CameraFollow>().UnhingeCamera(false);
+        fadeScreen.GetComponent<SpriteRenderer>().color -= new Color(0, 0, 0, 1);
+    }
+
+    public void StoreBullet(GameObject bullet)
+    {
+        bulletReference[numBulletsCaught] = bullet;
+        CatchBullet();
+    }
+
+    IEnumerator GiveBullets()
+    {
+        // at the end, give the bullets to doug, your employer
+        // spawn bullets at player's backpack
+        // bullets travel off the top of the screen
+        // then come down from the top near Doug
+
+        for (int i = 0; i < numBulletsCaught; i++)
+        {
+            bulletReference[i].GetComponent<Bullet>().TurnInBullets();
+            yield return new WaitForFixedUpdate();
+        }
+
+        yield return null;
+    }
+
+    IEnumerator Death()
+    {
+
+        // play death animation
+
+        // fade to black
+        SpriteRenderer sr = fadeScreen.GetComponent<SpriteRenderer>();
+        while(sr.color.a < 0.95f)
+        {
+            sr.color += new Color(0, 0, 0, 0.01f);
+            yield return new WaitForFixedUpdate();
+        }
+
+        transform.position = inBetweenPoint;
+        Camera.main.GetComponent<CameraFollow>().UnhingeCamera(true);
+
+        yield return new WaitForSeconds(5);
+
+        StartCoroutine(GiveBullets());
     }
 }

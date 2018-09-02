@@ -39,4 +39,10 @@ public class Weapon : MonoBehaviour {
         // from up because that is the default direction of the sprites. Sprites are made so up is the way they should point
         transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
     }
+
+    public void StoreBullet(GameObject bullet)
+    {
+        bullet.transform.parent = null;
+        parent.gameObject.GetComponent<Player>().StoreBullet(bullet);
+    }
 }

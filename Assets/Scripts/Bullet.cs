@@ -7,12 +7,31 @@ public class Bullet : MonoBehaviour {
 
     public float moveSpeed = 2;
     bool isMoving = true;
+    bool turningIn = false;
+    public float topOfScreen = -2;
+    public Vector3 topOfScreenEntrance;
+    public float endHeight = -3;
+    bool turningInToBoss = false;
 
     void FixedUpdate()
     {
         if (isMoving)
         {
             transform.position = Vector3.MoveTowards(transform.position, transform.position + transform.up, moveSpeed * Time.fixedDeltaTime);
+        }
+        if(turningIn)
+        {
+            if(transform.position.y > topOfScreen)
+            {
+                TurnInBulletsToBoss();
+            }
+        }
+        if(turningInToBoss)
+        {
+            if (transform.position.y < endHeight)
+            {
+                CaughtBullet();
+            }
         }
     }
 
@@ -27,6 +46,8 @@ public class Bullet : MonoBehaviour {
         {
             if (col.transform.tag == "Player")
             {
+                //Debug.Log("Hit player");
+                col.gameObject.GetComponent<Player>().HitByBullet(gameObject);
                 CaughtBullet();
             }
             if(col.transform.tag == "Catcher")
@@ -39,6 +60,27 @@ public class Bullet : MonoBehaviour {
                 DestroyBullet();
             }
         }
+    }
+
+    void TurnInBulletsToBoss()
+    {
+        // fire bullets down from the top of the screen
+        transform.position = topOfScreenEntrance;
+
+        turningIn = false;
+        transform.rotation = Quaternion.Euler(0, 0, 180);
+        turningInToBoss = true;
+    }
+
+    public void TurnInBullets()
+    {
+        // fire bullets up off screen
+
+        // face bullet up
+        transform.rotation = Quaternion.Euler(0, 0, 0);
+
+        isMoving = true;
+        turningIn = true;
     }
 
     void CaughtBullet()

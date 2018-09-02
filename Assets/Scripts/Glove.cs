@@ -17,6 +17,7 @@ public class Glove : Weapon {
     bool puttingAwayBullet = false;
     GameObject caughtBullet;
 
+    public Transform bulletStoragePoint;
 
     protected override void Start()
     {
@@ -54,10 +55,15 @@ public class Glove : Weapon {
 
     void FreeUpGlove()
     {
+        // store the bullet before you increment the score
+        StoreBullet(caughtBullet);
+
         //SetGloveOpen(true);
-        player.CatchBullet();
+        // catchbullet is now rolled into storebullet
+        //player.CatchBullet();
         puttingAwayBullet = false;
-        Destroy(caughtBullet);
+        //Destroy(caughtBullet);
+        caughtBullet.transform.position = bulletStoragePoint.position;
     }
 
     public void CatchBullet()
@@ -67,7 +73,7 @@ public class Glove : Weapon {
         SetGloveOpen(false);
         puttingAwayBullet = true;
         // move the bullet into the glove a bit
-        caughtBullet.transform.position = Vector3.MoveTowards(caughtBullet.transform.position, transform.position, 5 * Time.fixedDeltaTime);
+        caughtBullet.transform.position = Vector3.MoveTowards(caughtBullet.transform.position, transform.position, 3 * Time.fixedDeltaTime);
         Invoke("FreeUpGlove", timeToPutAwayBullet);
     }
 
