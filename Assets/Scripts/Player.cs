@@ -207,6 +207,12 @@ public class Player : MonoBehaviour {
         {
             bulletReference[numBulletsCaught] = bullet;
         }
+        else
+        {
+            // array is full
+            // destroy bullets instead
+            Destroy(bullet);
+        }
         CatchBullet();
     }
 
@@ -217,7 +223,8 @@ public class Player : MonoBehaviour {
         // bullets travel off the top of the screen
         // then come down from the top near Doug
 
-        for (int i = 0; i < numBulletsCaught; i++)
+        
+        for (int i = 0; i < Mathf.Clamp(numBulletsCaught, 0, bulletReference.Length); i++)
         {
             bulletReference[i].GetComponent<Bullet>().TurnInBullets();
             yield return new WaitForFixedUpdate();
